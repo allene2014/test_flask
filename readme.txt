@@ -26,6 +26,7 @@ method 2)[>>>>>>>>>>>>>only when no use migrate
     db.create_all()
 <<<<<<<<<<<<<<<<<<<]
 
+
 Endpoint user manage
 list users (/api/users) GET
 add user (/api/users) POST
