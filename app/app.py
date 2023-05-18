@@ -33,7 +33,30 @@ class User(db.Model):
     #image = db.Column(db.LargeBinary)
     def __repr__(self):
         return self.name
+    @classmethod
+    def get_all(cls):
+        return cls.query.all()
+    
+    @classmethod
+    def get_by_id(cls,id):
+        return cls.query.get_or_404(id)
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+class Publication(db.Model):
+    id=db.Column(db.Integer(),primary_key=True)  
+    title=db.Column(db.String(250),nullable=False)
+    description=db.Column(db.String(250),nullable=False)
+    priority=db.Column(db.String(250),nullable=False)
+    status=db.Column(db.String(250),nullable=False)
+
+    def __repr__(self):
+        return self.name
+    
     @classmethod
     def get_all(cls):
         return cls.query.all()
@@ -53,7 +76,15 @@ class UserSchema(Schema):
     id=fields.Integer()
     fullname=fields.String()
     email=fields.String()
-    password=fields.String()  
+    password=fields.String()
+
+class PublicationSchema(Schema):
+    id=fields.Integer()
+    title=fields.String()
+    description=fields.String()
+    priority=fields.String()
+    status=fields.String()
+
 @app.route('/api/users', methods=['GET'])
 def get_all_user():
     user = User.get_all()
@@ -103,6 +134,60 @@ def delete_user(id):
     usr_to_delete = User.get_by_id(id)
     usr_to_delete.delete()
     return jsonify({"message":"user removed"})
+
+#///////////////////////////////////////////////////////////////
+
+@app.route('/api/publications', methods=['GET'])
+def get_all_publication():
+    publication = Publication.get_all()
+    serializer=PublicationSchema(many=True)
+    data = serializer.dump(publication)
+    return jsonify(
+        data
+    )
+@app.route('/api/publications', methods=['POST'])
+def load_publication():
+    data = request.get_json()
+    add_publication =Publication(
+        title=data.get('title'),
+        description=data.get('description'),
+        priority=data.get('priority'),
+        status=data.get('status')
+        )
+    add_publication.save()
+    serializer = PublicationSchema()
+    data=serializer.dump(add_publication)
+    return jsonify(
+        data
+    )
+@app.route('/api/publications/<int:id>', methods=['GET'])
+def get_publication(id):
+    publication = Publication.get_by_id(id)
+    serializer = PublicationSchema()
+    data = serializer.dump(publication)
+    return jsonify(
+        data
+    )
+    
+@app.route('/api/publications/<int:id>', methods=['PUT'])
+def update_publication(id):
+    publication_update = Publication.get_by_id(id)
+
+    data=request.get_json()
+    publication_update.title=data.get('title')
+    publication_update.description=data.get('description')
+    publication_update.priority=data.get('priority')
+    publication_update.status=data.get('status')
+    db.session.commit()
+    serializer=PublicationSchema()
+    pub_data =  serializer.dump(publication_update)
+    return jsonify(pub_data)
+
+@app.route('/api/publication/delete/<int:id>', methods=['DELETE'])
+def delete_publication(id):
+    pub_to_delete = Publication.get_by_id(id)
+    pub_to_delete.delete()
+    return jsonify({"message":"Publication removed"})
 
 if __name__ == "__main__":
     with app.app_context():
