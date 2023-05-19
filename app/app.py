@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, url_for, session,jsonify
 from flask_sqlalchemy import SQLAlchemy
 from marshmallow import Schema,fields
 #from flask_marshmallow import Marshmallow
-#from werkzeug.utils import redirect, secure_filename
+from werkzeug.utils import redirect, secure_filename
 #from flask_migrate import Migrate
 
 app = Flask(__name__)
@@ -19,7 +19,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # object to database
 db = SQLAlchemy (app)
 
-#**app.secret_key = 'token_security'
+app.secret_key = 'token_security'
 
 # config  flask - migrate
 #**migrate = Migrate()
@@ -208,35 +208,34 @@ if __name__ == "__main__":
 #**    all_users = User.all()
 #**    return users_schema.dump(all_users)
 #**
-#**@app.route("/", methods = ['GET', 'POST'])
-#**def index():
-#**    if 'username' in session:
-#**        return render_template('main.html')#(f'Welcome {session["username"]}')
-#**    return '''<a href="/login">registrar nuevo usuario</a>'''
-#**    #'please register has new user'#render_template('start.html')
-#**
-#**
-#**@app.route('/login', methods=['GET', 'POST'])
-#**def login():
-#**    if request.method == 'POST':
-#**        user = request.form['username']
-#**        psw = request.form ['password']
-#**        session ['username'] = user
-#**
-#**        #session['username'] = request.form['username']
-#**        return redirect(url_for('index'))
-#**    return render_template('start.html')#'''
-#**    #    <form method="post">
-#**    #        <p><input type=text name=username>
-#**    #        <p><input type=submit value=Login>
-#**    #    </form>
-#**    #'''
-#**@app.route ('/logout')
-#**def logout():
-#**    session.pop('username')
-#**    return redirect(url_for('login'))
-#**
-#**@app.route ('/users', methods =['GET'])
-#**def getUsers():
-#**    return {"id":"1","name":'edgar',"username": "ae21"}
-#**
+@app.route("/", methods = ['GET', 'POST'])
+def index():
+    if 'username' in session:
+        return render_template('main.html')#(f'Welcome {session["username"]}')
+    return '''<a href="/login">registrar nuevo usuario</a>'''
+    #'please register has new user'#render_template('start.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        user = request.form['username']
+        psw = request.form ['password']
+        session ['username'] = user
+
+        #session['username'] = request.form['username']
+        return redirect(url_for('index'))
+    return render_template('start.html')#'''
+    #    <form method="post">
+    #        <p><input type=text name=username>
+    #        <p><input type=submit value=Login>
+    #    </form>
+    #'''
+@app.route ('/logout')
+def logout():
+    session.pop('username')
+    return redirect(url_for('login'))
+
+#@app.route ('/users', methods =['GET'])
+#def getUsers():
+#    return {"id":"1","name":'edgar',"username": "ae21"}
